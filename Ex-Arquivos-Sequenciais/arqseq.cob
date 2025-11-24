@@ -27,21 +27,35 @@
            05 WS-ARQ-AGE          PIC 99    VALUE ZEROS.
 
        77  EOF-ARQ                PIC A     VALUE 'N'.
+       77  WS-STATUS-IN           PIC XX.
       *
        PROCEDURE DIVISION.
        MAIN-PROCEDURE.
-            OPEN INPUT ARQIN.
-           PERFORM 2 TIMES
-               READ ARQIN INTO WS-ARQIN
-                   AT END
-                       MOVE 'Y' TO EOF-ARQ
-                   NOT AT END
-                       DISPLAY 'ARQ-COD:  ' WS-ARQ-COD
-                       DISPLAY 'ARQ-NAME: ' WS-ARQ-NAME
-                       DISPLAY 'ARQ-AGE:  ' WS-ARQ-AGE
-                       DISPLAY '----------------------'
-               END-READ
-           END-PERFORM
+           PERFORM 100-OPEN-FILE.
+           PERFORM UNTIL EOF-ARQ EQUAL 'Y'
+               PERFORM 200-PROCESS-FILE
+           END-PERFORM.
+           PERFORM 900-CLOSE-FILE.
+           STOP RUN.
+               
+       100-OPEN-FILE.    
+           OPEN INPUT ARQIN.
+           IF WS-STATUS-IN EQUAL '00'
+               CONTINUE
+           END-IF.
+               
+       200-PROCESS-FILE.
+           READ ARQIN INTO WS-ARQIN
+               AT END
+                   MOVE 'Y' TO EOF-ARQ
+               NOT AT END
+                   DISPLAY 'ARQ-COD:  ' WS-ARQ-COD
+                   DISPLAY 'ARQ-NAME: ' WS-ARQ-NAME
+                   DISPLAY 'ARQ-AGE:  ' WS-ARQ-AGE
+                   DISPLAY '----------------------'
+           END-READ.
+
+       900-CLOSE-FILE.
             CLOSE ARQIN.
-            STOP RUN.
+            
        END PROGRAM ARQSEQ.
